@@ -27,6 +27,8 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
 
     private var isExpanded = false
     private var isMenuOnTheLeft = true
+    private var dynamicMenuWidth = true
+    private var allowMeasureBackgroundContainerWidthOnce = false
 
     init {
         attrs?.let { getAttributes(context, it) }
@@ -37,6 +39,8 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         context.obtainStyledAttributes(attributeSet, R.styleable.SimpleSwipeMenuLayout)?.let {
             isMenuOnTheLeft =
                 it.getInt(R.styleable.SimpleSwipeMenuLayout_menuSide, ATTR_LEFT_INT_VALUE) == ATTR_LEFT_INT_VALUE
+            dynamicMenuWidth =
+                it.getBoolean(R.styleable.SimpleSwipeMenuLayout_dynamicMenuWidth, ATTR_DYNAMIC_MENU_WIDTH_DEFAULT)
             it.recycle()
         }
     }
@@ -55,12 +59,34 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         setConstraints()
 
         foregroundParams = foregroundContainer.layoutParams as LayoutParams
-
         backgroundParams = backgroundContainer.layoutParams as LayoutParams
-        backgroundContainerWidth = backgroundContainer.layoutParams.width
-        halfBackgroundContainerWidth = backgroundContainerWidth / 2
+
+        if (backgroundParams.height != REQUIRED_BACKGROUND_CONTAINER_HEIGHT) throw Throwable(
+            INCORRECT_BACKGROUND_CONTAINER_HEIGHT_MESSAGE
+        )
+
+        if (!dynamicMenuWidth) {
+            backgroundContainerWidth = backgroundContainer.layoutParams.width
+            halfBackgroundContainerWidth = backgroundContainerWidth / 2
+        }
 
         setOnTouchListener(getOnTouchListener())
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        if (dynamicMenuWidth && allowMeasureBackgroundContainerWidthOnce) {
+            allowMeasureBackgroundContainerWidthOnce = false
+            backgroundContainerWidth = backgroundContainer.measuredWidth
+            halfBackgroundContainerWidth = backgroundContainerWidth / 2
+        }
+    }
+
+    fun measureMenuWidth() {
+        if (dynamicMenuWidth) {
+            allowMeasureBackgroundContainerWidthOnce = true
+            backgroundContainer.invalidate()
+        }
     }
 
     private fun setConstraints() {
@@ -167,6 +193,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     companion object {
         var isSwiping = false
 
+        private const val ATTR_DYNAMIC_MENU_WIDTH_DEFAULT = true
         private const val ATTR_LEFT_INT_VALUE = 1
         private const val MIN_DISTANCE_TO_SWIPE = 10
 
@@ -183,6 +210,10 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
             "Incorrect ID, foreground container should have ID to correct attach constraints"
         private const val INCORRECT_BACKGROUND_CONTAINER_ID_MESSAGE =
             "Incorrect ID, background container should have ID to correct attach constraints"
+
+        private const val REQUIRED_BACKGROUND_CONTAINER_HEIGHT = 0
+        private const val INCORRECT_BACKGROUND_CONTAINER_HEIGHT_MESSAGE =
+            "Incorrect height, background container should have 0dp height"
     }
 
 }

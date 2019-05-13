@@ -5,16 +5,17 @@ Swipeable layout for Android
 
 ![Imgur](https://i.imgur.com/9Ny55DA.jpg)
 ![Imgur](https://i.imgur.com/2jas6aK.gif)
+![Imgur](https://i.imgur.com/pVMGYjD.jpg)
 
 ## 1. Dependency
 
 ```
-implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.0'
+implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.1'
 ```
 ```
 repositories {
     maven {
-        url  "https://dl.bintray.com/sulo61/Android" 
+        url  "https://dl.bintray.com/sulo61/Android"
     }
 }
 ```
@@ -25,11 +26,12 @@ repositories {
 
 ```
 <app:io.sulek.ssml.SimpleSwipeMenuLayout
-        xmlns:android="http://schemas.android.com/apk/res/android" 
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dynamicMenuWidth="false"
         app:menuSide="Right">
 
     <LinearLayout
@@ -49,8 +51,11 @@ repositories {
 
 #### important:
 - all layouts (main SimpleSwipeMenuLayout, foreground container and background container) must have IDs
-- background container should have specific width and 0dp height
-- choose side: app:menuSide="Left|Right"
+- background container should have 0dp height
+- choose menu side: app:menuSide="Left|Right"
+- app:dynamicMenuWidth="true|false"
+    - false use for better performance, background container width must be specified (like in example 200dp)
+    - true use for dynamic menu width, when background container has wrap_content width, remember to add measureMenuWidth() in view holder
 
 
 ### Recycler View
@@ -60,7 +65,7 @@ recyclerView.layoutManager = SSMLLinearLayoutManager(context)
 ```
 
 
-### Store and restore state 
+### Store and restore state
 
 #### isExpanded
 ```
@@ -79,6 +84,12 @@ itemView.swipeContainer.setOnSwipeListener(object : OnSwipeListener {
         sampleData.isExpanded = isExpanded
     }
 })
+```
+
+### Dynamic menu width
+```
+// only for dynamicMenuWidth=true (default), at the end of binding data in view holder
+itemView.swipeContainer.measureMenuWidth()
 ```
 
 ## 3. Licence
