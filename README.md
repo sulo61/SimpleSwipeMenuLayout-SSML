@@ -10,7 +10,7 @@ Swipeable layout for Android
 ## 1. Dependency
 
 ```
-implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.1'
+implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.3'
 ```
 ```
 repositories {
@@ -67,17 +67,12 @@ recyclerView.layoutManager = SSMLLinearLayoutManager(context)
 
 ### Store and restore state
 
-#### isExpanded
+#### Keep state in model
 ```
-data class SampleData(val title: String, val description: String, var isExpanded: Boolean = false)
-```
-
-#### holder
-```
-itemView.swipeContainer.setExpanded(sampleData.isExpanded)
+data class SampleData(..., var isExpanded: Boolean = false)
 ```
 
-### Listen for changes
+#### Listen for changes
 ```
 itemView.swipeContainer.setOnSwipeListener(object : OnSwipeListener {
     override fun onSwipe(isExpanded: Boolean) {
@@ -86,9 +81,10 @@ itemView.swipeContainer.setOnSwipeListener(object : OnSwipeListener {
 })
 ```
 
-### Prepare swipe layout to work with bound data (add at the end of binding function)
+### Apply
 ```
-itemView.swipeContainer.onFinishBindingData()
+// at the end of binding data function, this function perform some measurements
+itemView.swipeContainer.apply(sampleData.isExpanded)
 ```
 
 ## 3. Licence

@@ -30,7 +30,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     private var isExpanded = false
     private var isMenuOnTheLeft = true
     private var dynamicMenuWidth = true
-    private var allowMeasureBackgroundContainerWidthOnce = false
+    private var measureBackgroundContainerWidth = true
 
     init {
         attrs?.let { getAttributes(context, it) }
@@ -39,10 +39,10 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     @SuppressLint("Recycle")
     private fun getAttributes(context: Context, attributeSet: AttributeSet) {
         context.obtainStyledAttributes(attributeSet, R.styleable.SimpleSwipeMenuLayout)?.let {
-            isMenuOnTheLeft =
-                it.getInt(R.styleable.SimpleSwipeMenuLayout_menuSide, ATTR_LEFT_INT_VALUE) == ATTR_LEFT_INT_VALUE
-            dynamicMenuWidth =
-                it.getBoolean(R.styleable.SimpleSwipeMenuLayout_dynamicMenuWidth, ATTR_DYNAMIC_MENU_WIDTH_DEFAULT)
+            isMenuOnTheLeft = false
+            it.getInt(R.styleable.SimpleSwipeMenuLayout_menuSide, ATTR_LEFT_INT_VALUE) == ATTR_LEFT_INT_VALUE
+            dynamicMenuWidth = true
+            it.getBoolean(R.styleable.SimpleSwipeMenuLayout_dynamicMenuWidth, ATTR_DYNAMIC_MENU_WIDTH_DEFAULT)
             it.recycle()
         }
     }
@@ -79,19 +79,32 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        if (dynamicMenuWidth && allowMeasureBackgroundContainerWidthOnce) {
-            allowMeasureBackgroundContainerWidthOnce = false
-            backgroundContainerWidth = backgroundContainer.measuredWidth
-            halfBackgroundContainerWidth = backgroundContainerWidth / 2
+        if (dynamicMenuWidth && measureBackgroundContainerWidth) {
+            measureBackgroundContainerWidth = false
+            measureBackgroundContainerWidth()
         }
     }
 
-    fun onFinishBindingData() {
-        enableBackgroundContainerClickEventsOnExpand()
+    private fun measureBackgroundContainerWidth() {
+        backgroundContainerWidth = backgroundContainer.measuredWidth
+        halfBackgroundContainerWidth = backgroundContainerWidth / 2
+    }
+
+    fun apply(isExpanded: Boolean) {
+        this.isExpanded = isExpanded
+
+        refreshForegroundContainerSwipeStatus()
+
         if (dynamicMenuWidth) {
-            allowMeasureBackgroundContainerWidthOnce = true
-            backgroundContainer.invalidate()
+            post {
+                measureBackgroundContainerWidth()
+                refreshForegroundContainerSwipeStatus()
+            }
         }
+    }
+
+    private fun refreshForegroundContainerSwipeStatus() {
+        if (isExpanded) expand() else collapse()
     }
 
     private fun enableBackgroundContainerClickEventsOnExpand() {
@@ -153,10 +166,6 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         refreshForegroundContainerMargin()
         clearDistanceAfterMove()
         enableBackgroundContainerClickEventsOnExpand()
-    }
-
-    fun setExpanded(isExpanded: Boolean) {
-        if (isExpanded) expand() else collapse()
     }
 
     private fun clearDistanceAfterMove() {

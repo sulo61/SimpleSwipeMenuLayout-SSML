@@ -48,7 +48,6 @@ class SampleAdapter(context: Context) : RecyclerView.Adapter<SampleAdapter.Sampl
     inner class SampleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun setSampleData(sampleData: SampleData) {
-            itemView.swipeContainer.setExpanded(sampleData.isExpanded)
             itemView.swipeContainer.setOnSwipeListener(object : OnSwipeListener {
                 override fun onSwipe(isExpanded: Boolean) {
                     sampleData.isExpanded = isExpanded
@@ -56,8 +55,7 @@ class SampleAdapter(context: Context) : RecyclerView.Adapter<SampleAdapter.Sampl
             })
             itemView.titleText.text = sampleData.title
             itemView.descriptionText.text = sampleData.description
-            // only for dynamicMenuWidth=true (default)
-            // itemView.swipeContainer.onFinishBindingData()
+            itemView.swipeContainer.apply(sampleData.isExpanded)
         }
     }
 }
