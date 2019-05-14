@@ -57,7 +57,7 @@ class SampleAdapter(context: Context) : RecyclerView.Adapter<SampleAdapter.Sampl
             itemView.titleText.text = sampleData.title
             itemView.descriptionText.text = sampleData.description
             // only for dynamicMenuWidth=true (default)
-            // itemView.swipeContainer.measureMenuWidth()
+            // itemView.swipeContainer.onFinishBindingData()
         }
     }
 }

@@ -5,8 +5,10 @@ import android.util.AttributeSet
 import android.content.Context
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.children
 
 class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, style: Int = 0) :
     ConstraintLayout(context, attrs, style) {
@@ -70,6 +72,8 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
             halfBackgroundContainerWidth = backgroundContainerWidth / 2
         }
 
+        enableBackgroundContainerClickEventsOnExpand()
+
         setOnTouchListener(getOnTouchListener())
     }
 
@@ -82,10 +86,19 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         }
     }
 
-    fun measureMenuWidth() {
+    fun onFinishBindingData() {
+        enableBackgroundContainerClickEventsOnExpand()
         if (dynamicMenuWidth) {
             allowMeasureBackgroundContainerWidthOnce = true
             backgroundContainer.invalidate()
+        }
+    }
+
+    private fun enableBackgroundContainerClickEventsOnExpand() {
+        (backgroundContainer as? ViewGroup)?.let { viewGroup ->
+            viewGroup.children.forEach {
+                it.isClickable = isExpanded
+            }
         }
     }
 
@@ -104,8 +117,8 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     private fun getOnTouchListener() = OnTouchListener { _, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> onPressDown(event.x)
-            MotionEvent.ACTION_UP -> onReleasePress()
-            MotionEvent.ACTION_CANCEL -> onReleasePress()
+            MotionEvent.ACTION_UP -> onReleasePress(false)
+            MotionEvent.ACTION_CANCEL -> onReleasePress(true)
             MotionEvent.ACTION_MOVE -> onMove(event.x)
         }
         true
@@ -115,7 +128,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         positionOnActionDown = position
     }
 
-    private fun onReleasePress() {
+    private fun onReleasePress(loseTouch: Boolean) {
         val wasSwiping = isSwiping
 
         if (calculatedNewMargin > halfBackgroundContainerWidth) expand()
@@ -123,7 +136,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
 
         onSwipeListener?.onSwipe(isExpanded)
 
-        if (!wasSwiping) onClickListener?.onClick(this)
+        if (!loseTouch && !wasSwiping) onClickListener?.onClick(this)
     }
 
     private fun expand() {
@@ -131,6 +144,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         calculatedNewMargin = backgroundContainerWidth
         refreshForegroundContainerMargin()
         clearDistanceAfterMove()
+        enableBackgroundContainerClickEventsOnExpand()
     }
 
     private fun collapse() {
@@ -138,6 +152,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
         calculatedNewMargin = 0
         refreshForegroundContainerMargin()
         clearDistanceAfterMove()
+        enableBackgroundContainerClickEventsOnExpand()
     }
 
     fun setExpanded(isExpanded: Boolean) {

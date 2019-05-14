@@ -55,7 +55,7 @@ repositories {
 - choose menu side: app:menuSide="Left|Right"
 - app:dynamicMenuWidth="true|false"
     - false use for better performance, background container width must be specified (like in example 200dp)
-    - true use for dynamic menu width, when background container has wrap_content width, remember to add measureMenuWidth() in view holder
+    - true use for dynamic menu width, when background container has wrap_content width
 
 
 ### Recycler View
@@ -86,10 +86,9 @@ itemView.swipeContainer.setOnSwipeListener(object : OnSwipeListener {
 })
 ```
 
-### Dynamic menu width
+### Prepare swipe layout to work with bound data (add at the end of binding function)
 ```
-// only for dynamicMenuWidth=true (default), at the end of binding data in view holder
-itemView.swipeContainer.measureMenuWidth()
+itemView.swipeContainer.onFinishBindingData()
 ```
 
 ## 3. Licence
