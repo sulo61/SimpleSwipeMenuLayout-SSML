@@ -40,7 +40,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     private fun getAttributes(context: Context, attributeSet: AttributeSet) {
         context.obtainStyledAttributes(attributeSet, R.styleable.SimpleSwipeMenuLayout)?.let {
             isMenuOnTheLeft = false
-            it.getInt(R.styleable.SimpleSwipeMenuLayout_menuSide, ATTR_LEFT_INT_VALUE) == ATTR_LEFT_INT_VALUE
+            it.getInt(R.styleable.SimpleSwipeMenuLayout_menuSide, ATTR_LEFT_INT_VALUE)
             dynamicMenuWidth = true
             it.getBoolean(R.styleable.SimpleSwipeMenuLayout_dynamicMenuWidth, ATTR_DYNAMIC_MENU_WIDTH_DEFAULT)
             it.recycle()
@@ -142,7 +142,7 @@ class SimpleSwipeMenuLayout @JvmOverloads constructor(context: Context, attrs: A
     }
 
     private fun onReleasePress(loseTouch: Boolean) {
-        val wasSwiping = isSwiping
+        val wasSwiping = checkIfSwiping()
 
         if (calculatedNewMargin > halfBackgroundContainerWidth) expand()
         else collapse()

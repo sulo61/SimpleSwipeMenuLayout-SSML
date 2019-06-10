@@ -7,7 +7,7 @@ publish {
 
     def groupProjectID = 'io.sulek.ssml'
     def artifactProjectID = 'simpleswipemenulayout'
-    def publishVersionID = '1.0.3'
+    def publishVersionID = '1.0.4'
 
     userOrg = 'sulo61'
     repoName = 'Android'
@@ -25,8 +25,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
     }
 
     buildTypes {

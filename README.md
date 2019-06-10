@@ -10,7 +10,7 @@ Swipeable layout for Android
 ## 1. Dependency
 
 ```
-implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.3'
+implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.4'
 ```
 ```
 repositories {
