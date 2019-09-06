@@ -15,7 +15,7 @@ implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.4'
 ```
 repositories {
     maven {
-        url  "https://dl.bintray.com/sulo61/Android"
+        url  "https://jcenter.bintray.com" 
     }
 }
 ```
